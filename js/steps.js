@@ -1,5 +1,5 @@
 /* ============================================================
-   教學步驟資料定義（共 11 步）
+   教學步驟資料定義（共 9 步）
    步驟順序：
      1. 介紹
      2. 建立專案資料夾（修正問題 1）
@@ -8,10 +8,8 @@
      5. 安裝 Playwright（修正問題 3：指定在 skill 目錄安裝）
      6. 驗證環境
      7. 切換至 Moving Planner Mode
-     8. 填寫搬家基本資訊
-     9. 回答 Bob 的確認問題
-    10. 確認七階段計畫草稿
-    11. 產生 PDF 並確認成果
+     8. 填寫搬家資訊 → 回答確認問題（★ 同一對話中連續執行）
+     9. 確認計畫草稿 → 產生 PDF（★ 同一對話中連續執行）
 ============================================================ */
 
 const STEPS = [
@@ -73,7 +71,6 @@ const STEPS = [
       "已在電腦上建立專案資料夾（如 C:\\Projects\\my-move，名稱可自訂）",
       "已在 Bob 介面使用「開啟資料夾」選擇此目錄",
       "Bob 的工作目錄顯示為剛才建立的資料夾",
-      "資料夾路徑不含中文字元或特殊符號（避免路徑問題）",
     ],
   },
 
@@ -81,7 +78,7 @@ const STEPS = [
   {
     tag: "建立 Mode",
     title: "向 Bob 請求建立 Moving Planner Mode",
-    desc: "告訴 Bob 建立搬家規劃模式，並確保設定中包含 execute 工具群組（否則無法執行腳本）。",
+    desc: "告訴 Bob 建立搬家規劃模式，並確保設定中包含 execute 工具（否則無法執行腳本）。",
     prompt: `我想建立一個 Bob 自訂模式，專門用於規劃搬家。
 這個模式要叫做「Moving Planner」（slug: moving-planner）。
 
@@ -95,7 +92,7 @@ const STEPS = [
 重要：這個 Mode 必須包含以下所有工具群組：
   groups: [read, edit, execute, skill]
 
-其中 execute 群組不可省略，否則無法執行 Python 與 Node.js 腳本。
+其中 execute 不可省略，否則無法執行 Python 與 Node.js 腳本。
 
 請幫我建立這個 Mode 的完整設定並寫入 .bob/custom_modes.yaml。`,
     result: `<p>Bob 會建立 <code>.bob/custom_modes.yaml</code>，其中關鍵是 <code>groups</code> 必須包含 <code>execute</code>：</p>
@@ -121,7 +118,6 @@ Bob 在 Moving Planner 模式下將無法執行
 generate_html.py 或 generate_pdf.js，
 整個 PDF 產生流程會卡住。</div>`,
     checklist: [
-      "已向 Bob 輸入建立 Mode 的 Prompt",
       ".bob/custom_modes.yaml 檔案已建立",
       "YAML 中確認包含 slug: moving-planner",
       "YAML 的 groups 清單包含 read、edit、skill、execute",
@@ -183,11 +179,10 @@ generate_html.py 執行時會報錯：
 「找不到 HTML 模板：templates/moving-plan.html」
 整個 HTML/PDF 產生流程會中斷。</div>`,
     checklist: [
-      "已向 Bob 輸入建立 Skill 的 Prompt",
       ".bob/skills/moving-plan-pdf/SKILL.md 已建立",
       ".bob/skills/moving-plan-pdf/scripts/generate_html.py 已建立",
       ".bob/skills/moving-plan-pdf/scripts/generate_pdf.js 已建立",
-      ".bob/skills/moving-plan-pdf/templates/moving-plan.html",
+      ".bob/skills/moving-plan-pdf/templates/moving-plan.html 已建立",
       ".bob/skills/moving-plan-pdf/package.json 已建立並包含 playwright 依賴",
       "HTML 模板包含 {{TITLE}}、{{STAGES}} 等必要替換變數",
     ],
@@ -280,8 +275,6 @@ generate_pdf.js 的 require('playwright')
     checklist: [
       "已確認 Node.js 已安裝（node -v 應顯示 v18 以上版本）",
       "已確認 Python 3 已安裝（python --version 或 python3 --version）",
-      ".bob/skills/moving-plan-pdf/package.json 存在且包含 playwright 依賴",
-      "npm install 是在 .bob/skills/moving-plan-pdf/ 目錄下執行（非全域、非專案根目錄）",
       ".bob/skills/moving-plan-pdf/node_modules/playwright/ 目錄已存在",
       "Chromium 瀏覽器安裝完成（無報錯）",
     ],
@@ -307,23 +300,24 @@ generate_pdf.js 的 require('playwright')
     result: `<p>全部通過後，Bob 會顯示完整的環境驗證報告：</p>
 <div class="result-mock">環境驗證報告
 ─────────────────────────────────────
-✅ Node.js v20.11.0        — 已安裝（≥ v18）
-✅ Python 3.11.4           — 已安裝（≥ 3.8）
-✅ custom_modes.yaml       — 包含 moving-planner mode
-✅ SKILL.md                — 存在
+✅ Node.js v20.11.0           — 已安裝（≥ v18）
+✅ Python 3.11.4              — 已安裝（≥ 3.8）
+✅ custom_modes.yaml          — 包含 moving-planner mode
+✅ SKILL.md                   — 存在
 ✅ templates/moving-plan.html — 存在（含必要替換變數）
-✅ node_modules/playwright — 已安裝在 skill 目錄下
-✅ Playwright Chromium     — 已安裝
+✅ node_modules/playwright    — 已安裝在 skill 目錄下
+✅ Playwright Chromium        — 已安裝
 
 所有環境需求均已滿足。
 可以開始使用 Moving Planner 模式。</div>`,
     checklist: [
-      "Node.js 版本 v18 以上（驗證通過）",
-      "Python 3.8 以上（驗證通過）",
-      "custom_modes.yaml 存在且包含 moving-planner",
-      "templates/moving-plan.html 存在",
-      "node_modules/playwright 在 skill 目錄下存在",
-      "Chromium 瀏覽器已安裝（驗證通過）",
+      "Node.js 版本（驗證通過）",
+      "Python 版本（驗證通過）",
+      "custom_modes.yaml",
+      "SKILL.md",
+      "templates/moving-plan.html",
+      "node_modules/playwright",
+      "Chromium 已安裝（驗證通過）",
     ],
   },
 
@@ -352,19 +346,33 @@ generate_pdf.js 的 require('playwright')
     ],
   },
 
-  /* ── 步驟 8：填寫搬家資訊 ── */
+  /* ── 步驟 8：填寫搬家資訊 + 回答確認問題 ── */
   {
     tag: "輸入資訊",
-    title: "填寫搬家基本資訊",
-    desc: "提供你的搬家情境，Bob 將以此為基礎建立個人化的搬家計畫。",
-    prompt: `我預計在 2025 年 10 月 30 日搬家。
+    title: "填寫搬家資訊並回答 Bob 的確認問題",
+    desc: "在同一個對話中，先提供搬家基本資訊，再回答 Bob 提出的補充問題，確保計畫涵蓋所有重要細節。",
+    sameSession: true,
+    prompts: [
+      {
+        label: "第 1 則訊息　先傳送這則",
+        text: `我預計在 2025 年 10 月 30 日搬家。
 目前住所是兩房一廳，新住所也是兩房一廳。
 家庭有 2 個人。沒有小孩或寵物。
 大型家具有沙發、雙人床、書桌，不需要搬冰箱和洗衣機（新住所已有）。
 我們打算自己租車搬，不請搬家公司。
 搬家距離大約 5 公里，兩邊都有電梯。
 目前還沒開始打包。`,
-    result: `<p>Bob 會根據你提供的資訊，進行初步評估並規劃任務量。</p>
+      },
+      {
+        label: "第 2 則訊息　等 Bob 提出問題後再傳送",
+        text: `1. 停車和裝卸部分：兩邊大樓門口都可以停車，不需要申請。
+2. 新住所鑰匙：搬家前一週可以取得。
+3. 水電和網路：網路需要重新申請，水電沿用原帳戶。
+4. 地址變更：需要更新身分證地址和銀行帳戶。
+5. 清潔：舊住所需要做退租清潔，新住所搬進去前也想掃一次。`,
+      },
+    ],
+    result: `<p>Bob 收到基本資訊後會提出補充問題，回答後整合所有資訊，準備產生七階段計畫草稿。</p>
 <div class="result-mock">已收到搬家資訊 ✓
 
 搬家日期：2025-10-30（距今約 X 週）
@@ -376,24 +384,8 @@ generate_pdf.js 的 require('playwright')
 ⚠️  注意：目前尚未開始打包，
     建議盡早開始整理不常用物品。
 
-我還需要確認幾個細節...</div>`,
-    checklist: [
-      "已提供 Prompt"
-    ],
-  },
-
-  /* ── 步驟 9：回答 Bob 的問題 ── */
-  {
-    tag: "確認細節",
-    title: "回答 Bob 的確認問題",
-    desc: "Bob 會提出幾個補充問題，確保計畫涵蓋所有重要細節。",
-    prompt: `1. 停車和裝卸部分：兩邊大樓門口都可以停車，不需要申請。
-2. 新住所鑰匙：搬家前一週可以取得。
-3. 水電和網路：網路需要重新申請，水電沿用原帳戶。
-4. 地址變更：需要更新身分證地址和銀行帳戶。
-5. 清潔：舊住所需要做退租清潔，新住所搬進去前也想掃一次。`,
-    result: `<p>回答完確認問題後，Bob 會整合所有資訊，準備產生七階段計畫草稿。</p>
-<div class="result-mock">確認問題已完整回答 ✓
+我還需要確認幾個細節...</div>
+<div class="result-mock" style="margin-top:8px">確認問題已完整回答 ✓
 
 額外任務已加入計畫：
 + 申請新住所網路（HIGH 優先）
@@ -404,24 +396,25 @@ generate_pdf.js 的 require('playwright')
 
 正在建立七階段搬家計畫草稿...</div>`,
     checklist: [
-      "已回答停車與裝卸限制相關問題",
-      "已確認新住所鑰匙取得時間",
-      "已說明水電與網路辦理狀況",
-      "已說明地址變更需求",
-      "已確認清潔需求（舊住所退租清潔、新住所入住清潔）",
+      "已輸入第一則訊息（搬家基本資訊）",
+      "已等待 Bob 提出確認問題",
+      "已在同一對話中回答停車、鑰匙、水電網路、地址變更、清潔等細節",
+      "Bob 已回覆「正在建立七階段搬家計畫草稿」",
     ],
   },
 
-  /* ── 步驟 10：確認計畫草稿 ── */
+  /* ── 步驟 9：確認計畫草稿 + 產生 PDF ── */
   {
-    tag: "確認計畫",
-    title: "確認七階段搬家計畫草稿",
-    desc: "Bob 會展示完整的七階段任務清單，你可以確認或要求修改。",
+    tag: "確認並產生",
+    title: "確認七階段計畫並產生 PDF",
+    desc: "在同一個對話中確認 Bob 展示的七階段任務清單（可要求修改），確認後 Bob 自動執行 JSON → HTML → PDF 整個流程。",
+    sameSession: true,
+    sameSessionNote: "請繼續在<strong>步驟 8 的同一個 Bob 對話</strong>中輸入，不要開新對話",
     prompt: `這份計畫草稿看起來很完整，我確認內容正確。
 請幫我把搬家前 2 週的「整理書房雜物」改成高優先，
 並在搬家前 1 週加上「拍照記錄家具位置」這個任務。
 修改完成後，請幫我產生搬家計畫 PDF。`,
-    result: `<p>Bob 展示草稿並接受你的修改，確認後立即呼叫 Skill 產生文件。</p>
+    result: `<p>Bob 更新草稿後立即呼叫 Skill，依序自動執行完整轉換流程：</p>
 <div class="result-mock">計畫草稿更新完成 ✓
 
 📋 七階段任務摘要：
@@ -433,29 +426,8 @@ generate_pdf.js 的 require('playwright')
   搬家當天    ▸ 7 個任務（5 HIGH / 2 MEDIUM）
   搬家後 1 週  ▸ 5 個任務（2 HIGH / 2 MEDIUM / 1 LOW）
 
-共 46 個任務。開始產生 PDF...</div>`,
-    checklist: [
-      "已閱讀所有七個階段的任務清單",
-      "已確認各任務的優先級（HIGH / MEDIUM / LOW）合理",
-      "已提出需要修改的任務（若有）並獲得 Bob 更新",
-      "已輸入確認指令讓 Bob 繼續產生 PDF",
-    ],
-  },
-
-  /* ── 步驟 11：產生 PDF 並確認成果 ── */
-  {
-    tag: "產生 PDF",
-    title: "產生 PDF 並確認最終成果",
-    desc: "Bob 依序執行 JSON → HTML → PDF，完成後驗證三個輸出檔案均正確產生。",
-    isAuto: true,
-    prompt: `# 這個步驟由 Bob 自動執行，不需要額外輸入
-# Bob 在計畫確認後，會自動依序：
-# 1. 建立 output/moving-plan.json
-# 2. 執行 python scripts/generate_html.py
-# 3. 執行 node scripts/generate_pdf.js
-# 4. 驗證三個輸出檔案`,
-    result: `<p>Bob 會依序自動執行完整的轉換流程：</p>
-<div class="result-mock">✅ 已建立 output/ 目錄
+共 46 個任務。開始產生 PDF...</div>
+<div class="result-mock" style="margin-top:8px">✅ 已建立 output/ 目錄
 ✅ 已寫入 output/moving-plan.json（2.4 KB）
 ✅ JSON 結構驗證通過（7 個階段均存在）
 
@@ -482,11 +454,13 @@ Top Priorities:
   <li>每完成一項任務，在 Bob 中更新狀態並重新產生 PDF</li>
 </ul>`,
     checklist: [
+      "已閱讀所有七個階段的任務清單",
+      "已確認各任務的優先級（HIGH / MEDIUM / LOW）合理",
+      "已提出需要修改的任務（若有）並獲得 Bob 更新",
       "output/moving-plan.json 已成功產生",
       "output/moving-plan.html 已成功產生",
       "output/moving-plan.pdf 已成功產生",
       "已開啟 PDF 確認包含七個搬家階段與正確日期",
-      "已將 PDF 儲存到方便存取的位置（如桌面或雲端硬碟）",
     ],
   },
 ];

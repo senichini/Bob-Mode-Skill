@@ -14,24 +14,41 @@ function renderStep(index) {
   const step = STEPS[index];
   const card  = document.getElementById('stepCard');
 
-  const promptLabel = step.isIntro
-    ? '說明'
-    : step.isAuto
-      ? '自動執行（無需輸入）'
-      : '在 Bob 對話框中輸入此 Prompt';
+  const sameSessionBadge = step.sameSession
+    ? `<div class="same-session-notice">
+        <span class="ss-icon">💬</span>
+        ${step.sameSessionNote
+          ? step.sameSessionNote
+          : '以下操作請在<strong>同一個 Bob 對話</strong>中連續執行，不要開新對話'}
+       </div>`
+    : '';
 
-  let html = `
-    <div class="step-header">
-      <div class="step-number-badge">${index + 1}</div>
-      <div class="step-title-group">
-        <span class="step-tag">${escHtml(step.tag)}</span>
-        <div class="step-title">${escHtml(step.title)}</div>
-        <div class="step-desc">${escHtml(step.desc)}</div>
-      </div>
-    </div>
-    <div class="sections-wrap">
+  /* ── 雙 Prompt 欄（prompts 陣列）──────────────────── */
+  let promptSection;
+  if (step.prompts) {
+    promptSection = `<div class="dual-prompt-row">` +
+      step.prompts.map((p, si) => `
+        <div class="section-block block-prompt dual-prompt-col">
+          <div class="section-label">
+            <span class="icon icon-prompt">⌨</span>
+            ${escHtml(p.label)}
+            <span class="label-spacer"></span>
+            <button class="copy-btn" id="copyBtn-${index}-${si}" onclick="copyPromptByKey(${index},${si})">複製</button>
+          </div>
+          <div class="prompt-wrap">
+            <pre class="prompt-code" id="promptCode-${index}-${si}">${escHtml(p.text)}</pre>
+          </div>
+        </div>`).join('') +
+      `</div>`;
+  } else {
+    /* ── 單 Prompt 欄（原有邏輯）──────────────────────── */
+    const promptLabel = step.isIntro
+      ? '說明'
+      : step.isAuto
+        ? '自動執行（無需輸入）'
+        : '在 Bob 對話框中輸入此 Prompt';
 
-      <!-- ── Prompt 區塊（上方全寬） ── -->
+    promptSection = `
       <div class="section-block ${step.isIntro || step.isAuto ? 'block-desc' : 'block-prompt'}">
         <div class="section-label">
           <span class="icon icon-prompt">⌨</span>
@@ -45,7 +62,22 @@ function renderStep(index) {
             ? `<div class="prompt-desc" id="promptCode-${index}">${escHtml(step.prompt)}</div>`
             : `<pre class="prompt-code" id="promptCode-${index}">${escHtml(step.prompt)}</pre>`}
         </div>
+      </div>`;
+  }
+
+  let html = `
+    <div class="step-header">
+      <div class="step-number-badge">${index + 1}</div>
+      <div class="step-title-group">
+        <span class="step-tag">${escHtml(step.tag)}</span>
+        <div class="step-title">${escHtml(step.title)}</div>
+        <div class="step-desc">${escHtml(step.desc)}</div>
       </div>
+    </div>
+    ${sameSessionBadge}
+    <div class="sections-wrap">
+
+      ${promptSection}
 
       <!-- ── 下方兩欄：預期結果 + 驗收清單 ── -->
       <div class="bottom-row">
@@ -86,40 +118,37 @@ function renderStep(index) {
 /* ============================================================
    複製 Prompt 功能
 ============================================================ */
-function copyPrompt(index) {
-  const text = STEPS[index].prompt;
-  const btn  = document.getElementById(`copyBtn-${index}`);
-
+function _doCopy(text, btn) {
   /* 過濾掉 # 開頭的說明行 */
-  const cleanText = text
-    .split('\n')
-    .filter(line => !line.startsWith('#'))
-    .join('\n')
-    .trim();
+  const clean = text.split('\n').filter(l => !l.startsWith('#')).join('\n').trim();
+  const payload = clean || text;
 
-  navigator.clipboard.writeText(cleanText || text).then(() => {
+  const flash = () => {
     btn.textContent = '已複製！';
     btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = '複製';
-      btn.classList.remove('copied');
-    }, 2000);
-  }).catch(() => {
+    setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
+  };
+
+  navigator.clipboard.writeText(payload).then(flash).catch(() => {
     const ta = document.createElement('textarea');
-    ta.value = cleanText || text;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
+    ta.value = payload;
+    ta.style.cssText = 'position:fixed;left:-9999px';
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    btn.textContent = '已複製！';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = '複製';
-      btn.classList.remove('copied');
-    }, 2000);
+    flash();
   });
+}
+
+/* 單 prompt 步驟 */
+function copyPrompt(index) {
+  _doCopy(STEPS[index].prompt, document.getElementById(`copyBtn-${index}`));
+}
+
+/* 雙 prompts 步驟：subIndex = 0 或 1 */
+function copyPromptByKey(index, subIndex) {
+  _doCopy(STEPS[index].prompts[subIndex].text, document.getElementById(`copyBtn-${index}-${subIndex}`));
 }
 
 /* ============================================================
@@ -242,7 +271,7 @@ function showFinish() {
    彩帶動畫
 ============================================================ */
 function launchConfetti() {
-  const emojis = ['🎉', '🎊', '✨', '🥳', '🎈', '⭐', '🌟'];
+  const emojis = ['❤️', '🧡', '💛', '💚', '💙', '💜', '🩷', '🩵', '💖', '💗', '💓', '💝'];
   const count  = 36;
 
   for (let i = 0; i < count; i++) {
