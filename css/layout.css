@@ -1,0 +1,122 @@
+/* ===== 頁面頂部標題列 ===== */
+.site-header {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.site-logo {
+  width: 40px;
+  height: 40px;
+  background: #2563eb;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.site-logo svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+
+.site-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.site-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* ===== 進度條 ===== */
+.progress-bar-wrap {
+  width: 100%;
+  max-width: 1200px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  height: 4px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ===== 步驟計數器 ===== */
+.step-counter {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+
+.step-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+  letter-spacing: 0.3px;
+}
+
+.step-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.step-dot.active {
+  background: #2563eb;
+}
+.step-dot.done {
+  background: #93c5fd;
+}
+
+/* ===== 主卡片容器（撐滿剩餘高度，溢出隱藏以支援動畫） ===== */
+.card-viewport {
+  width: 100%;
+  max-width: 1200px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow:
+    0 4px 24px rgba(37, 99, 235, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* ===== 頁尾 ===== */
+.site-footer {
+  font-size: 11px;
+  color: #94a3b8;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+  padding: 6px 0 8px;
+  width: 100%;
+  max-width: 1200px;
+  flex-shrink: 0;
+}

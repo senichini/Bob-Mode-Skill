@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bob - Mode &amp; Skill 動手做</title>
+  <link rel="stylesheet" href="/tutorial/css/style.css" />
+</head>
+<body>
+
+  <!-- ===== 頁面頂部標題 ===== -->
+  <!-- data-tour-step="header"：導覽第 1 步的目標元素 -->
+  <header class="site-header" data-tour-step="header">
+    <div class="site-logo">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 8H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zM10 3h4v5h-4V3zM9 12h6v1H9v-1z"/>
+      </svg>
+    </div>
+    <div>
+      <div class="site-title">Bob - Mode &amp; Skill 動手做</div>
+      <div class="site-subtitle">跟著步驟，親手建立你的第一個自訂 Mode 與 Skill</div>
+    </div>
+
+    <!-- Tour Toggle 開關 -->
+    <div class="tour-toggle-wrap" data-tour-step="toggle">
+      <label class="tour-toggle-label" id="tourToggleLabel" for="tourToggleInput">開啟導覽</label>
+      <input
+        type="checkbox"
+        id="tourToggleInput"
+        class="tour-toggle-input"
+        onchange="onTourToggleChange(this.checked)"
+        aria-label="開啟或關閉互動導覽"
+      />
+      <label class="tour-toggle-track" for="tourToggleInput" aria-hidden="true"></label>
+    </div>
+  </header>
+
+  <!-- ===== 進度條 ===== -->
+  <!-- data-tour-step="progress"：導覽第 2 步的目標元素 -->
+  <div class="progress-bar-wrap" data-tour-step="progress">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+
+  <!-- ===== 步驟計數器與點狀指示 ===== -->
+  <!-- data-tour-step="stepcounter"：導覽第 3 步的目標元素 -->
+  <div class="step-counter" data-tour-step="stepcounter">
+    <span class="step-label" id="stepLabel">步驟 1 / 11</span>
+    <div class="step-dots" id="stepDots"></div>
+  </div>
+
+  <!-- ===== 主卡片視口 ===== -->
+  <!-- data-tour-step="card"：導覽第 4 步的目標元素 -->
+  <div class="card-viewport" data-tour-step="card">
+    <div class="step-card" id="stepCard">
+      <!-- 內容由 JavaScript 動態渲染 -->
+    </div>
+  </div>
+
+  <!-- ===== 側邊導覽按鈕（固定在畫面兩側） ===== -->
+  <!-- data-tour-step="navbtns"：導覽第 5 步的目標元素（右側圓形切換按鈕） -->
+  <button class="nav-btn nav-btn-prev" id="btnPrev" onclick="navigate(-1)" disabled>←</button>
+  <button class="nav-btn nav-btn-next" id="btnNext" onclick="navigate(1)" data-tour-step="navbtns">→</button>
+
+  <p class="keyboard-hint">
+    可使用鍵盤 <kbd>←</kbd> <kbd>→</kbd> 切換步驟
+  </p>
+
+  <!--
+    載入順序：
+      1. steps.js      — STEPS 資料陣列
+      2. tour-steps.js — TOUR_STEPS 資料陣列
+      3. app.js        — 主邏輯（依賴 STEPS）
+      4. tour.js       — Tour Engine（依賴 TOUR_STEPS）
+  -->
+  <script src="/tutorial/js/steps.js"></script>
+  <script src="/tutorial/js/tour-steps.js"></script>
+  <script src="/tutorial/js/app.js"></script>
+  <script src="/tutorial/js/tour.js"></script>
+
+</body>
+</html>

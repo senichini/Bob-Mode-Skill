@@ -1,0 +1,29 @@
+/* ===== 基礎重置與全域樣式 ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 整頁鎖定 100vh，禁止瀏覽器捲軸 */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family:
+    -apple-system, "Segoe UI", "Microsoft JhengHei", "PingFang TC", system-ui,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  background: #f0f4f8;
+  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 16px 0;
+}

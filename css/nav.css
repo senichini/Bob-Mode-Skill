@@ -1,0 +1,110 @@
+/* ===== 底部導覽（固定在底部，不捲動） ===== */
+.nav-bar {
+  display: none;
+}
+
+/* ===== 全高側邊導覽按鈕 ===== */
+.nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  border: 1.5px solid rgba(148, 163, 184, 0.45);
+  background: transparent;
+  color: rgba(148, 163, 184, 0.6);
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+  font-family: inherit;
+  z-index: 100;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: rgba(100, 116, 139, 0.7);
+  color: #475569;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.nav-btn:active:not(:disabled) {
+  background: rgba(148, 163, 184, 0.25);
+  transform: translateY(-50%) scale(0.96);
+}
+
+.nav-btn:disabled {
+  opacity: 0;
+  cursor: default;
+  pointer-events: none;
+}
+
+.nav-btn-prev {
+  left: 10px;
+}
+.nav-btn-next {
+  right: 10px;
+}
+
+.nav-btn-finish {
+  right: 10px;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(5, 150, 105, 0.45);
+  background: transparent;
+  color: rgba(5, 150, 105, 0.7);
+  font-size: 20px;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
+}
+
+.nav-btn-finish:hover {
+  background: rgba(5, 150, 105, 0.12);
+  border-color: #059669;
+  color: #047857;
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* ===== 鍵盤提示 ===== */
+.keyboard-hint {
+  margin-top: 6px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.keyboard-hint kbd {
+  display: inline-block;
+  background: #e2e8f0;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-family: inherit;
+}
+
+@media (max-width: 600px) {
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,276 @@
+/* ================================================================
+   引導導覽（Onboarding Tour）樣式
+   ================================================================ */
+
+/* ── 全螢幕深色遮罩 ──
+   Spotlight 原理：
+     .tour-overlay 是一個用 JS 設定好 top/left/width/height 的 fixed div，
+     位置 = 目標元素的 BoundingClientRect（加 padding）。
+     div 本身背景透明，四周用超大 box-shadow 打暗，
+     視覺上就像「只有這個區域亮著，其餘打暗」。
+*/
+.tour-overlay {
+  position: fixed;
+  /* 初始大小設為 0（JS 會立即覆寫） */
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  background: transparent;
+  /* 超大外擴 box-shadow 製造全頁遮罩，overlay 內部保持透明即為鏤空 */
+  box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.72);
+  border-radius: 10px;
+  z-index: 9000;
+  pointer-events: none; /* 遮罩本身不擋滑鼠事件 */
+  transition:
+    top 0.2s ease,
+    left 0.2s ease,
+    width 0.2s ease,
+    height 0.2s ease;
+}
+
+/* spotlight 高亮框線（覆蓋在 overlay 外緣，視覺輔助） */
+.tour-overlay::after {
+  content: "";
+  position: absolute;
+  inset: -4px; /* 向外擴 4px，讓框線包住 overlay */
+  border: 2px solid rgba(37, 99, 235, 0.7);
+  border-radius: 13px;
+  pointer-events: none;
+}
+
+/* 遮罩可點擊區域（用於「點擊遮罩跳過」的透明覆蓋層） */
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 8999;
+  background: transparent;
+  cursor: default;
+}
+
+/* ── 導覽說明框（Tooltip / Popover） ── */
+.tour-tooltip {
+  position: fixed;
+  z-index: 9100;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow:
+    0 8px 40px rgba(15, 23, 42, 0.22),
+    0 2px 8px rgba(15, 23, 42, 0.1);
+  padding: 20px 22px 16px;
+  width: 320px;
+  max-width: calc(100vw - 24px);
+  font-family:
+    -apple-system, "Segoe UI", "Microsoft JhengHei", "PingFang TC", system-ui,
+    sans-serif;
+  animation: tourFadeIn 0.25s ease both;
+  transition:
+    left 0.2s ease,
+    top 0.2s ease;
+}
+
+@keyframes tourFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* reflow 觸發用：暫時停止動畫，讓瀏覽器重設播放狀態 */
+.tour-tooltip.tour-tt-reflow {
+  animation: none !important;
+}
+
+/* 箭頭尖角（自動換方向由 JS 控制 class） */
+.tour-tooltip::before {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  transform: rotate(45deg);
+  /* 箭頭置於內容文字之下，避免遮住標題 */
+  z-index: 0;
+}
+.tour-tooltip.arrow-top::before {
+  top: -6px;
+  left: 24px;
+  box-shadow: -2px -2px 4px rgba(15, 23, 42, 0.06);
+}
+.tour-tooltip.arrow-bottom::before {
+  bottom: -6px;
+  left: 24px;
+  box-shadow: 2px 2px 4px rgba(15, 23, 42, 0.06);
+}
+.tour-tooltip.arrow-left::before {
+  left: -6px;
+  top: var(--arrow-offset, 20px);
+  box-shadow: -2px 2px 4px rgba(15, 23, 42, 0.06);
+}
+.tour-tooltip.arrow-right::before {
+  right: -6px;
+  top: var(--arrow-offset, 20px);
+  box-shadow: 2px -2px 4px rgba(15, 23, 42, 0.06);
+}
+
+/* 確保 tooltip 內部所有內容都在箭頭上層 */
+.tour-tt-header,
+.tour-tt-body,
+.tour-tt-actions {
+  position: relative;
+  z-index: 1;
+}
+
+/* 說明框頂列：標題 + 步驟進度 */
+.tour-tt-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tour-tt-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.tour-tt-progress {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+/* 說明文字 */
+.tour-tt-body {
+  font-size: 13.5px;
+  color: #475569;
+  line-height: 1.65;
+  margin-bottom: 16px;
+}
+
+/* 操作按鈕列 */
+.tour-tt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tour-btn {
+  padding: 7px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.18s,
+    color 0.18s;
+  line-height: 1;
+}
+
+/* 下一步（主色） */
+.tour-btn-next {
+  background: #2563eb;
+  color: #ffffff;
+}
+.tour-btn-next:hover {
+  background: #1d4ed8;
+}
+
+/* 上一步（次要） */
+.tour-btn-prev {
+  background: #f1f5f9;
+  color: #475569;
+}
+.tour-btn-prev:hover {
+  background: #e2e8f0;
+}
+.tour-btn-prev:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Tour Toggle 開關（放置在 Header 右側） ── */
+.tour-toggle-wrap {
+  margin-left: auto; /* 推到最右端 */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.tour-toggle-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+  user-select: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.tour-toggle-label.active {
+  color: #2563eb;
+}
+
+/* 實際的 checkbox（隱藏） */
+.tour-toggle-input {
+  display: none;
+}
+
+/* 視覺開關軌道 */
+.tour-toggle-track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.25s;
+  flex-shrink: 0;
+}
+.tour-toggle-input:checked + .tour-toggle-track {
+  background: #2563eb;
+}
+
+/* 開關滑塊 */
+.tour-toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+.tour-toggle-input:checked + .tour-toggle-track::after {
+  transform: translateX(18px);
+}
+
+/* 目標元素被 spotlight 時，提升至遮罩上層 */
+.tour-spotlight-target {
+  z-index: 9050 !important;
+  border-radius: 8px;
+  outline: none;
+}
+
+/* RWD：手機上 tooltip 寬度縮窄 */
+@media (max-width: 480px) {
+  .tour-tooltip {
+    width: calc(100vw - 24px);
+    padding: 16px 16px 14px;
+  }
+}
