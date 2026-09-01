@@ -7,7 +7,7 @@
 ## 目錄結構
 
 ```
-tutorial/
+Bob-Mode-Skill/
 ├── index.html            # 頁面入口（全靜態，無後端）
 ├── css/
 │   ├── style.css         # 匯總入口（@import 各模組）
@@ -52,7 +52,7 @@ tutorial/
 **方法一：直接開啟（部分瀏覽器限制 `@import` 跨檔讀取）**
 
 ```
-直接雙擊 tutorial/index.html
+直接雙擊 index.html
 ```
 
 **方法二：本地靜態伺服器（推薦）**
@@ -66,7 +66,7 @@ npx http-server .
 python -m http.server 8080
 ```
 
-開啟後瀏覽 `http://localhost:8080/tutorial/`
+開啟後瀏覽 `http://localhost:8080/`
 
 ---
 
