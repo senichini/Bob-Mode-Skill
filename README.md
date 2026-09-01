@@ -19,7 +19,7 @@ Bob-Mode-Skill/
 │   ├── finish.css        # 完成遮罩、Modal、彩帶動畫
 │   └── tour.css          # Spotlight Onboarding 導覽
 └── js/
-    ├── steps.js          # 教學步驟資料（STEPS 陣列，共 11 步）
+    ├── steps.js          # 教學步驟資料（STEPS 陣列，共 9 步）
     ├── tour-steps.js     # 導覽說明資料（TOUR_STEPS 陣列，共 5 步）
     ├── app.js            # 主邏輯（渲染、翻頁、複製、清單、彩帶）
     └── tour.js           # Spotlight Tour Engine
@@ -27,7 +27,7 @@ Bob-Mode-Skill/
 
 ---
 
-## 教學流程（11 步）
+## 教學流程（9 步）
 
 | # | 標籤 | 類型 | 說明 |
 |---|------|------|------|
@@ -38,10 +38,10 @@ Bob-Mode-Skill/
 | 5 | 安裝依賴 | Prompt | 在 `.bob/skills/moving-plan-pdf/` 目錄下安裝 Playwright 與 Chromium |
 | 6 | 驗證環境 | Prompt | 確認 Node.js ≥ v18、Python 3 ≥ 3.8、檔案結構與套件均就緒 |
 | 7 | 啟動工具 | 說明 | 從 Bob 介面的模式選單，手動切換至 Moving Planner 模式 |
-| 8 | 輸入資訊 | Prompt | 提供搬家日期、住所類型、人數、大型家具、搬運方式等基本資訊 |
-| 9 | 確認細節 | Prompt | 回答 Bob 提出的停車、鑰匙、水電、網路、地址、清潔等補充問題 |
-| 10 | 確認計畫 | Prompt | 審閱七階段草稿、提出修改，確認後觸發 PDF 產生流程 |
-| 11 | 產生 PDF | 自動 | Bob 自動依序執行 JSON → HTML → PDF 轉換並驗證三個輸出檔案 |
+| 8 | 輸入資訊 | 雙 Prompt | 先傳送搬家基本資訊，等 Bob 提問後再回答停車、鑰匙、水電等確認細節 |
+| 9 | 確認並產生 | 雙 Prompt | 在同一對話審閱七階段草稿並提出修改，確認後 Bob 自動執行 JSON → HTML → PDF |
+
+> **步驟 8 與 9 均包含兩則訊息（雙 Prompt）**，需在同一對話內依序傳送，不可開新對話。
 
 ---
 
@@ -74,20 +74,35 @@ python -m http.server 8080
 
 ### 資料驅動設計
 
-所有教學內容集中在 [`js/steps.js`](js/steps.js)，以 `STEPS` 陣列定義每個步驟物件：
+所有教學內容集中在[`js/steps.js`](js/steps.js)，以 `STEPS` 陣列定義每個步驟物件：
 
 ```js
 {
-  tag:       "建立 Mode",           // 左上角標籤
-  title:     "向 Bob 請求建立...",  // 標題
-  desc:       "...",               // 副標題說明
-  prompt:    `...`,                // 可複製的 Prompt 文字
-  result:    `<p>...</p>`,         // 預期結果（允許 HTML）
-  checklist: ["...", "..."],       // 驗收清單項目
-  isIntro:   true,                 // 可選：說明步驟，無須輸入 Prompt（步驟 1、2、7）
-  isAuto:    true,                 // 可選：Bob 自動執行，無須使用者輸入（步驟 11）
+  tag:            "建立 Mode",          // 左上角標籤
+  title:          "向 Bob 請求建立...", // 標題
+  desc:           "...",               // 副標題說明
+  prompt:         `...`,               // 單一可複製的 Prompt（一般步驟）
+  prompts:        [...],               // 雙 Prompt 陣列（步驟 8、9 使用）
+  result:         `<p>...</p>`,        // 預期結果（允許 HTML）
+  checklist:      ["...", "..."],      // 驗收清單項目
+  isIntro:        true,                // 可選：說明步驟，無須輸入 Prompt（步驟 1、2、7）
+  sameSession:    true,                // 可選：需在同一對話中連續傳送訊息（步驟 8、9）
+  sameSessionNote: "...",              // 可選：同一對話提示文字（步驟 9）
 }
 ```
+
+### 雙 Prompt 設計
+
+步驟 8（輸入資訊）與步驟 9（確認並產生）採用 `prompts` 陣列，每個物件包含：
+
+```js
+prompts: [
+  { label: "第 1 則訊息　先傳送這則", text: `...` },
+  { label: "第 2 則訊息　等 Bob 提出問題後再傳送", text: `...` },
+]
+```
+
+UI 會依序呈現兩個可複製的 Prompt 區塊，並顯示傳送順序提示，避免使用者跳過中間步驟。
 
 ### 使用者體驗功能
 
@@ -112,7 +127,7 @@ python -m http.server 8080
 1. 在 `STEPS` 陣列中新增或修改步驟物件
 2. 確保 `checklist` 至少包含一個項目
 3. 若為純說明步驟（不需複製），加上 `isIntro: true`
-4. 若步驟由 Bob 自動執行（不需使用者輸入），加上 `isAuto: true`
+4. 若需要在同一對話傳送兩則訊息，使用 `prompts` 陣列取代 `prompt` 字串，並加上 `sameSession: true`
 
 其餘 UI 邏輯（進度、計數、動畫）由 [`js/app.js`](js/app.js) 自動處理，無需修改。
 
