@@ -48,28 +48,21 @@ const STEPS = [
     tag: "建立資料夾",
     title: "建立並開啟專案資料夾",
     desc: "在開始一切操作前，必須先建立一個專屬的專案資料夾，並以此作為 Bob 的工作目錄。",
-    prompt: `# 步驟說明：先在電腦上建立資料夾，再用 Bob 開啟
-# 以下指令可在 PowerShell / 終端機中執行：
+    isIntro: true,
+    prompt: `這個步驟不需要輸入 Prompt，請手動操作：
 
-# Windows PowerShell：
-New-Item -ItemType Directory -Path "C:\\Projects\\my-move"
-cd "C:\\Projects\\my-move"
+1. 在電腦上建立一個新資料夾，例如 C:\\Projects\\my-move（Windows）或 ~/Projects/my-move（macOS / Linux）
+   （資料夾名稱「my-move」可自行替換，但只能使用英數字、連字號 - 或底線 _，不可含中文或空格）
 
-# macOS / Linux：
-mkdir -p ~/Projects/my-move
-cd ~/Projects/my-move
+2. 開啟 Bob 應用程式，點擊左上角「開啟資料夾」，選擇剛才建立的資料夾
 
-# 建立完成後，在 Bob 介面使用「開啟資料夾」選擇此目錄`,
-    result: `<p>建立並開啟專案資料夾後，你的工作環境才有明確的根目錄，後續所有路徑都會以此為基準：</p>
-<ul class="result-info-list">
-  <li><code>my-move/.bob/</code> — Bob 設定目錄（Mode、Skill）</li>
-  <li><code>my-move/.bob/custom_modes.yaml</code> — 自訂模式設定</li>
-  <li><code>my-move/.bob/skills/moving-plan-pdf/</code> — Skill 與其依賴</li>
-  <li><code>my-move/output/</code> — 最終輸出的 JSON / HTML / PDF</li>
-</ul>
-<div class="result-mock">✅ 資料夾已建立：C:\\Projects\\my-move
+3. 確認 Bob 視窗標題或側邊欄顯示的根目錄已更新為你剛才選擇的資料夾路徑
+
+這個資料夾將作為整個教學的工作根目錄，後續所有 Bob 建立的設定與輸出檔案都會放在這裡。`,
+    result: `<p>完成後，Bob 的工作目錄已設定完成，資料夾目前只有你建立的空目錄：</p>
+<div class="result-mock">✅ 資料夾已建立：C:\\Projects\\my-move（名稱可自訂）
 ✅ Bob 已開啟此資料夾作為工作區
-✅ 目前工作目錄：C:\\Projects\\my-move
+✅ 目前工作目錄：C:\\Projects\\my-move（名稱可自訂）
 
 現在可以開始建立 Mode 與 Skill 設定。</div>
 <div class="result-mock mock-warn" style="margin-top:10px">⚠️  常見錯誤：
@@ -77,7 +70,7 @@ cd ~/Projects/my-move
 所有路徑將無法正確對應，
 導致 .bob/ 目錄位置不確定。</div>`,
     checklist: [
-      "已在電腦上建立專案資料夾（如 C:\\Projects\\my-move）",
+      "已在電腦上建立專案資料夾（如 C:\\Projects\\my-move，名稱可自訂）",
       "已在 Bob 介面使用「開啟資料夾」選擇此目錄",
       "Bob 的工作目錄顯示為剛才建立的資料夾",
       "資料夾路徑不含中文字元或特殊符號（避免路徑問題）",
@@ -152,14 +145,18 @@ generate_html.py 或 generate_pdf.js，
 PDF 必須包含七個固定章節（搬家前 4 週、2 週、1 週、3 天、前一天、當天、搬家後 1 週）。
 
 請幫我建立這個 Skill 的完整設定、所有腳本，以及 HTML 模板。
-特別注意：templates/moving-plan.html 這個模板檔案必須一起建立，
-generate_html.py 在執行時需要讀取這個模板。`,
+特別注意：
+- templates/moving-plan.html 這個模板檔案必須一起建立，
+  generate_html.py 在執行時需要讀取這個模板。
+- package.json 必須一起建立，並在 dependencies 中宣告 playwright 依賴，
+  例如：{ "dependencies": { "playwright": "^1.40.0" } }
+  這樣 npm install 才能正確安裝 Playwright 套件。`,
     result: `<p>Bob 會建立 Skill 所需的完整檔案，其中 <code>templates/moving-plan.html</code> 是關鍵：</p>
 <ul class="result-info-list">
   <li><code>SKILL.md</code> — Skill 說明與流程定義</li>
   <li><code>scripts/generate_html.py</code> — JSON → HTML 轉換腳本</li>
   <li><code>scripts/generate_pdf.js</code> — HTML → PDF 轉換腳本</li>
-  <li><strong><code>templates/moving-plan.html</code> — PDF 版面模板（必要）</strong></li>
+  <li><code>templates/moving-plan.html</code> — PDF 版面模板</li>
   <li><code>package.json</code> — 宣告 playwright 依賴</li>
 </ul>
 <p style="margin-top:8px">HTML 模板的最小必要結構（須包含以下替換變數）：</p>
@@ -200,50 +197,91 @@ generate_html.py 執行時會報錯：
   {
     tag: "安裝依賴",
     title: "在 Skill 目錄下安裝 Playwright",
-    desc: "Playwright 必須安裝在 .bob/skills/moving-plan-pdf/ 目錄下，而非全域安裝，否則 Node.js 找不到套件。",
+    desc: "⚠️ 重要：Playwright 套件必須安裝在 .bob/skills/moving-plan-pdf/ 目錄下，絕對不可使用 npm install -g 全域安裝，否則 Node.js 執行時將找不到套件。",
     prompt: `請幫我安裝 moving-plan-pdf skill 所需的 Playwright 套件。
 
-注意事項：
-1. npm install 必須在 .bob/skills/moving-plan-pdf/ 目錄下執行
-2. Chromium 瀏覽器需額外透過 npx playwright install chromium 安裝
-3. 請先確認 Node.js 與 Python 3 已安裝
+重要限制：
+- 必須在 .bob/skills/moving-plan-pdf/ 目錄下執行 npm install
+- 禁止使用 npm install -g playwright 全域安裝
+- 套件必須安裝到該目錄的 node_modules/ 下，generate_pdf.js 才能正確 require
+
+防呆步驟（執行 npm install 前請先確認）：
+1. 確認 .bob/skills/moving-plan-pdf/ 目錄存在
+2. 確認該目錄下有 package.json 檔案；若不存在，先在該目錄建立以下內容的 package.json：
+   {
+     "name": "moving-plan-pdf",
+     "version": "1.0.0",
+     "dependencies": {
+       "playwright": "^1.40.0"
+     }
+   }
+3. package.json 建立後，再切換到該目錄執行 npm install
+
+其他注意事項：
+1. Chromium 瀏覽器需額外透過 npx playwright install chromium 安裝
+2. 請先確認 Node.js 與 Python 3 已安裝
 
 請按照以下步驟執行：
-- 切換到 .bob/skills/moving-plan-pdf/ 目錄
-- 在該目錄執行 npm install
+- 切換到 .bob/skills/moving-plan-pdf/ 目錄（cd .bob/skills/moving-plan-pdf）
+- 確認或建立 package.json（內容如上）
+- 在該目錄執行 npm install（不是在專案根目錄）
 - 執行 npx playwright install chromium
 - 確認安裝成功
 
 使用 cmd 執行命令，不要用 PowerShell。`,
-    result: `<p>安裝步驟說明（需在正確目錄下執行）：</p>
-<div class="result-mock mock-code"># 第一步：切換到 Skill 目錄
+    result: `
+<p>安裝步驟說明（以下為說明，不須實際操作，Bob 會協助建立）：</p>
+<div class="result-mock mock-code"># 第一步：切換到 Skill 目錄（必須在此目錄下安裝，不可在專案根目錄）
 cd .bob/skills/moving-plan-pdf
 
-# 第二步：安裝 npm 套件（playwright 會安裝在此目錄的 node_modules 下）
+# 第二步（防呆）：若 package.json 不存在，先建立它
+# 確認是否存在：
+#   Windows: if not exist package.json (...)
+#   macOS/Linux: [ ! -f package.json ] && ...
+# 手動建立內容（存為 package.json）：
+# {
+#   "name": "moving-plan-pdf",
+#   "version": "1.0.0",
+#   "dependencies": {
+#     "playwright": "^1.40.0"
+#   }
+# }
+
+# 第三步：安裝 npm 套件（playwright 會安裝在此目錄的 node_modules 下）
 npm install
 
-# 第三步：安裝 Chromium 瀏覽器
+# 第四步：安裝 Chromium 瀏覽器
 npx playwright install chromium
 
-# 第四步：驗證 Playwright 可被找到
+# 第五步：驗證 Playwright 可被找到
 node -e "require('./node_modules/playwright')"</div>
+<p style="margin-top:8px">package.json 範本（若目錄下不存在時建立）：</p>
+<div class="result-mock mock-code">{
+  "name": "moving-plan-pdf",
+  "version": "1.0.0",
+  "dependencies": {
+    "playwright": "^1.40.0"
+  }
+}</div>
 <p style="margin-top:8px">安裝成功後的目錄結構：</p>
 <div class="result-mock">✅ .bob/skills/moving-plan-pdf/
      ├── node_modules/
-     │   ├── playwright/        ← 套件安裝在此
+     │   ├── playwright/        ← 套件必須在此（非全域）
      │   └── playwright-core/
      ├── package.json
      └── package-lock.json</div>
 <div class="result-mock mock-warn" style="margin-top:10px">⚠️  常見錯誤：
 若從專案根目錄執行 npm install（而非 skill 目錄），
 node_modules 會建立在錯誤位置，
-generate_pdf.js 的 require('playwright') 
+generate_pdf.js 的 require('playwright')
 將找不到套件，報錯：Cannot find module 'playwright'。
 
 解決方法：cd .bob/skills/moving-plan-pdf 後再執行 npm install。</div>`,
     checklist: [
       "已確認 Node.js 已安裝（node -v 應顯示 v18 以上版本）",
       "已確認 Python 3 已安裝（python --version 或 python3 --version）",
+      ".bob/skills/moving-plan-pdf/package.json 存在且包含 playwright 依賴",
+      "npm install 是在 .bob/skills/moving-plan-pdf/ 目錄下執行（非全域、非專案根目錄）",
       ".bob/skills/moving-plan-pdf/node_modules/playwright/ 目錄已存在",
       "Chromium 瀏覽器安裝完成（無報錯）",
     ],
@@ -306,11 +344,8 @@ generate_pdf.js 的 require('playwright')
 </ul>
 <div class="result-mock">切換至 Moving Planner 模式後 🏠
 
-請告訴 Bob 你的搬家基本資訊：
-- 預計搬家日期是什麼時候？
-- 目前住所和新住所的房型各是？
-- 家庭有幾個人？
-... 等等資訊</div>`,
+- 直接進入下一步驟
+- 有提供 Prompt 範例</div>`,
     checklist: [
       "已從 Bob 介面的模式選單切換至 Moving Planner 模式",
       "介面顯示「Moving Planner」模式標籤",

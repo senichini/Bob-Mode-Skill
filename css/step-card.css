@@ -127,6 +127,13 @@
   min-height: 0;
 }
 
+/* 說明區塊（isIntro / isAuto）：高度適中，允許自然展開 */
+.section-block.block-desc {
+  flex: 0 0 auto;
+  max-height: 230px;
+  min-height: 0;
+}
+
 .section-label {
   display: flex;
   align-items: center;

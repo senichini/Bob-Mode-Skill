@@ -29,19 +29,19 @@ Bob-Mode-Skill/
 
 ## 教學流程（11 步）
 
-| # | 標籤 | 說明 |
-|---|------|------|
-| 1 | 介紹 | 了解 Moving Planner 的功能與最終產出 |
-| 2 | 建立資料夾 | 建立專案目錄並以 Bob 開啟作為工作區 |
-| 3 | 建立 Mode | 向 Bob 請求建立 Moving Planner Mode（含 `execute` 群組） |
-| 4 | 建立 Skill | 建立 `moving-plan-pdf` Skill 與 HTML 模板 |
-| 5 | 安裝依賴 | 在 Skill 目錄下安裝 Playwright 與 Chromium |
-| 6 | 驗證環境 | 確認 Node.js、Python 3、檔案與套件均就緒 |
-| 7 | 啟動工具 | 從 Bob 介面手動切換至 Moving Planner Mode |
-| 8 | 輸入資訊 | 填寫搬家日期、住所類型、家庭人數等基本資訊 |
-| 9 | 確認細節 | 回答 Bob 提出的停車、鑰匙、水電、地址等補充問題 |
-| 10 | 確認計畫 | 審閱七階段草稿並提出修改，確認後觸發 PDF 產生 |
-| 11 | 產生 PDF | Bob 自動執行 JSON → HTML → PDF 轉換並驗證輸出 |
+| # | 標籤 | 類型 | 說明 |
+|---|------|------|------|
+| 1 | 介紹 | 說明 | 了解 Moving Planner 的功能與最終三份輸出（JSON / HTML / PDF） |
+| 2 | 建立資料夾 | 說明 | 建立專案目錄並以 Bob 開啟作為工作區；路徑不可含中文或空格 |
+| 3 | 建立 Mode | Prompt | 向 Bob 請求建立 Moving Planner Mode，`groups` 必須包含 `execute` |
+| 4 | 建立 Skill | Prompt | 建立 `moving-plan-pdf` Skill（含 HTML 模板、腳本、`package.json`） |
+| 5 | 安裝依賴 | Prompt | 在 `.bob/skills/moving-plan-pdf/` 目錄下安裝 Playwright 與 Chromium |
+| 6 | 驗證環境 | Prompt | 確認 Node.js ≥ v18、Python 3 ≥ 3.8、檔案結構與套件均就緒 |
+| 7 | 啟動工具 | 說明 | 從 Bob 介面的模式選單，手動切換至 Moving Planner 模式 |
+| 8 | 輸入資訊 | Prompt | 提供搬家日期、住所類型、人數、大型家具、搬運方式等基本資訊 |
+| 9 | 確認細節 | Prompt | 回答 Bob 提出的停車、鑰匙、水電、網路、地址、清潔等補充問題 |
+| 10 | 確認計畫 | Prompt | 審閱七階段草稿、提出修改，確認後觸發 PDF 產生流程 |
+| 11 | 產生 PDF | 自動 | Bob 自動依序執行 JSON → HTML → PDF 轉換並驗證三個輸出檔案 |
 
 ---
 
@@ -84,8 +84,8 @@ python -m http.server 8080
   prompt:    `...`,                // 可複製的 Prompt 文字
   result:    `<p>...</p>`,         // 預期結果（允許 HTML）
   checklist: ["...", "..."],       // 驗收清單項目
-  isIntro:   true,                 // 可選：說明步驟（隱藏複製按鈕）
-  isAuto:    true,                 // 可選：自動執行步驟（隱藏複製按鈕）
+  isIntro:   true,                 // 可選：說明步驟，無須輸入 Prompt（步驟 1、2、7）
+  isAuto:    true,                 // 可選：Bob 自動執行，無須使用者輸入（步驟 11）
 }
 ```
 

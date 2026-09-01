@@ -32,7 +32,7 @@ function renderStep(index) {
     <div class="sections-wrap">
 
       <!-- ── Prompt 區塊（上方全寬） ── -->
-      <div class="section-block block-prompt">
+      <div class="section-block ${step.isIntro || step.isAuto ? 'block-desc' : 'block-prompt'}">
         <div class="section-label">
           <span class="icon icon-prompt">⌨</span>
           ${escHtml(promptLabel)}
@@ -41,7 +41,9 @@ function renderStep(index) {
             : ''}
         </div>
         <div class="prompt-wrap">
-          <pre class="prompt-code" id="promptCode-${index}">${escHtml(step.prompt)}</pre>
+          ${step.isIntro || step.isAuto
+            ? `<div class="prompt-desc" id="promptCode-${index}">${escHtml(step.prompt)}</div>`
+            : `<pre class="prompt-code" id="promptCode-${index}">${escHtml(step.prompt)}</pre>`}
         </div>
       </div>
 
