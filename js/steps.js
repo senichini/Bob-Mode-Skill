@@ -21,7 +21,7 @@ const STEPS = [
     prompt: `# 這個步驟不需要輸入 Prompt
 # 請先閱讀下方的預期結果，了解整體流程後再繼續。`,
     isIntro: true,
-    result: `<p><strong>Moving Planner</strong> 是 Bob AI 助手內建的搬家規劃模式，結合 <code>moving-plan-pdf</code> 技能，可以：</p>
+    result: `<p><strong>Moving Planner</strong> 是在 Bob 自訂的搬家規劃 Mode ，結合 <code>moving-plan-pdf</code> Skill，可以：</p>
 <ul class="result-info-list">
   <li>根據你的搬家情境，自動產生七個階段的詳細待辦清單</li>
   <li>將計畫整理成結構化的 JSON 資料</li>
